@@ -1,35 +1,35 @@
 pragma solidity ^0.4.2;
 
-contract TodoList {
-  TodoItem[] todoItems;
+contract SupplyChain {
+  StockItem[] stockItems;
 
   event ItemCheckedin(address owner, uint time);
   event ItemCheckedout(address owner, uint time);
 
-  mapping (address => TodoItem[]) public Items;
+  mapping (address => StockItem[]) public Items;
   mapping (bytes32 => address[]) public Record;
 
-  struct TodoItem {
+  struct StockItem {
     bytes32 value;
     bool active;
   }
 
 
-  function addTodoItem(bytes32 _value) returns (bool success) {
+  function ScanItem(bytes32 _value) returns (bool success) {
     address merchant = msg.sender;
 
-    TodoItem memory todoItem;
-    todoItem.value = _value;
-    todoItem.active = true;
+    StockItem memory stockItem;
+    stockItem.value = _value;
+    stockItem.active = true;
 
-    Items[msg.sender].push(todoItem);  // see this guy has how many items
+    Items[msg.sender].push(stockItem);  // see this guy has how many items
     Record[_value].push(merchant);  // push merchant into array
 
     ItemCheckedin( msg.sender, now);
     return true;
   }
 
-  function getTodoItems() constant returns (bytes32[], bool[]) {
+  function getItems() constant returns (bytes32[], bool[]) {
 
     uint length = Items[msg.sender].length;
 
@@ -50,7 +50,7 @@ contract TodoList {
   }
 
 
-  function checkoutTodoItem(uint index) returns (bool success) {
+  function checkoutItem(uint index) returns (bool success) {
     if (index >=  Items[msg.sender].length) return;
     Items[msg.sender][index].active = false;
 

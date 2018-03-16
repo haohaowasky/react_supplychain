@@ -1,29 +1,32 @@
 import React, { Component } from 'react';
-import TodoListContract from '../build/contracts/TodoList.json';
+import SupplyChainContract from '../build/contracts/SupplyChain.json';
 import web3, {
   selectContractInstance, mapReponseToJSON
 } from './web3';
-import {H3,InputAccount, AccountContainer,Container, Header, H1, H2, TodoListContainer, InputText, List,TodoItem,ItemLabel,DestroyBtn,PendingContainer,Pending} from './style.js';
+import {H3,Inner, InnerBox, InputAccount, AccountContainer,Container, Header, H1, H2, TodoListContainer, InputText, List,TodoItem,ItemLabel,DestroyBtn,PendingContainer,Pending} from './style.js';
 
-class TodoList extends Component {
+class SupplyList extends Component {
   render() {
     return (
+
       <Container>
-        <Header>
-          <H1>Supplychain scaning portal</H1>
-          <H2> scan yout item </H2>
-          <H3>
-            {this.state.eventItemin.map((item, itmIndex) =>
-              <TodoItem key={item.value}>
-                <ItemLabel>{item}</ItemLabel>
-              </TodoItem>
-            )}
-          </H3>
-        </Header>
+      <Header>
+        <H1>Supplychain scanning portal</H1>
+        <H2> scan your item </H2>
+        <H3>
+          {this.state.eventItemin.map((item, itmIndex) =>
+            <TodoItem key={item.value}>
+              <ItemLabel>{item}</ItemLabel>
+            </TodoItem>
+          )}
+        </H3>
+
+      </Header>
+      <Inner>
         <TodoListContainer>
           <InputText
             value={this.state.newItem}
-            placeholder="Input anything to put into blockchain"
+            placeholder="Scan your item"
             onChange={e => this.setState({ newItem: e.target.value })}
             onKeyDown={this.handleSubmit}
           />
@@ -35,8 +38,7 @@ class TodoList extends Component {
                   <ItemLabel>{item.active ? this.state.positive: this.state.negative}</ItemLabel>
 
                   <DestroyBtn
-                    onClick={() => this.deleteTodoItem(itmIndex)}
-                    X
+                    onClick={() => this.scanoutItem(itmIndex)}
                   >
                  </DestroyBtn>
                 </TodoItem>
@@ -44,6 +46,7 @@ class TodoList extends Component {
             </List>
           }
         </TodoListContainer>
+        <InnerBox>
         <PendingContainer>
           <Pending
             active={this.state.pending}
@@ -67,8 +70,9 @@ class TodoList extends Component {
             onChange= {e => this.setState({ accountNumber: e.target.value })}
             onKeyDown={this.changeAccount}
           />
+          <H3> Select Account </H3>
         </AccountContainer>
-
+        </InnerBox>
         <TodoListContainer>
           <InputText
             value={this.state.pastitem}
@@ -82,18 +86,17 @@ class TodoList extends Component {
               {this.state.addressArray.map((item, itmIndex) =>
                 <TodoItem key={itmIndex}>
                   <ItemLabel>{item}</ItemLabel>
-                  <ItemLabel>{itmIndex + 1} nd checked</ItemLabel>
+                  <ItemLabel>{itmIndex + 1} checked</ItemLabel>
                 </TodoItem>
               )}
             </List>
           }
         </TodoListContainer>
-
+        </Inner>
       </Container>
-
-
     );
   }
+  
 
   constructor(props) {
     super(props);
@@ -114,15 +117,15 @@ class TodoList extends Component {
 
     this.handleSubmit = this.handleSubmit.bind(this);
     this.searchSubmit = this.searchSubmit.bind(this);
-    this.deleteTodoItem = this.deleteTodoItem.bind(this);
+    this.scanoutItem = this.scanoutItem.bind(this);
     this.changeAccount = this.changeAccount.bind(this);
     this.readEvent = this.readEvent.bind(this);
   }
 
   async readEvent() {
 
-    this.todoList = await selectContractInstance(TodoListContract); // json abiSupplyChain
-    var events = this.todoList.ItemCheckedin({fromBlock: 0, toBlock: 'latest'});
+    this.SupplyList = await selectContractInstance(SupplyChainContract); // json abiSupplyChain
+    var events = this.SupplyList.ItemCheckedin({fromBlock: 0, toBlock: 'latest'});
     events.watch(function(error, result){
       const eventItemin = mapReponseToJSON(
         result, ['value', 'active'], 'arrayOfObject'
@@ -132,8 +135,8 @@ class TodoList extends Component {
   }
 
   async componentWillMount() {
-    this.todoList = await selectContractInstance(TodoListContract); // json abiSupplyChain
-    const todoItems = await this.getTodoItems();
+    this.SupplyList = await selectContractInstance(SupplyChainContract); // json abiSupplyChain
+    const todoItems = await this.getItems();
     this.setState({ todoItems }); // set the initial value
   }
 
@@ -141,17 +144,9 @@ class TodoList extends Component {
   async handleSubmit({ key }) {
     if (key !== 'Enter') return;
     this.setState({ pending: true });
-    const todoList = await selectContractInstance(TodoListContract); // everytime it submits, it has the updates.
-    await todoList.addTodoItem(this.state.newItem, { from: web3.eth.accounts[this.state.accountNumber], gas:3000000});
-
-    // todoList is like calling the smartconract somehow
-    // the addTodoItem in .sol takes 1 parameter,which is a byte32 value, along with the wallet address.
-    const todoItems = await this.getTodoItems();
-
-    // once added to the blockchain, updated the todoItems with getTodoItems.
-    // the getTodoItems returns me array of bytes and array of bools
-    // the getTodoitems is a functiont that has the ability to convert
-
+    const SupplyList = await selectContractInstance(SupplyChainContract); // everytime it submits, it has the updates.
+    await SupplyList.ScanItem(this.state.newItem, { from: web3.eth.accounts[this.state.accountNumber], gas:3000000});
+    const todoItems = await this.getItems();
     this.setState({ todoItems, newItem: '', pending: false });
   }
 
@@ -159,9 +154,7 @@ class TodoList extends Component {
   async searchSubmit({ key }) {
     if (key !== 'Enter') return;
     this.setState({ calling: true });
-
-    const addressArray = await this.todoList.getAdresses(this.state.pastitem,{from: web3.eth.accounts[this.state.accountNumber], gas:3000000});
-
+    const addressArray = await this.SupplyList.getAdresses(this.state.pastitem,{from: web3.eth.accounts[this.state.accountNumber], gas:3000000});
     this.setState({ addressArray, calling: false });
     return addressArray;
 
@@ -171,34 +164,30 @@ class TodoList extends Component {
   async changeAccount({ key }) {
     if (key !== 'Enter') return;
     this.setState({ pending: true });
-
-    const todoItems = await this.getTodoItems();
-
+    const todoItems = await this.getItems();
     this.setState({todoItems, pending: false });
   }
 
 
-  async getTodoItems() {
+  async getItems() {
     this.setState({ calling: true });
-
-    const todoItemsResp = await this.todoList.getTodoItems({from: web3.eth.accounts[this.state.accountNumber]});
+    const todoItemsResp = await this.SupplyList.getItems({from: web3.eth.accounts[this.state.accountNumber]});
     const todoItems = mapReponseToJSON(
       todoItemsResp, ['value', 'active'], 'arrayOfObject'
     );
-
     this.setState({ calling: false });
     return todoItems;
   }
 
-  async deleteTodoItem(position) {
-    this.setState({ pending: true });
-    await this.todoList.checkoutTodoItem(position, {from: web3.eth.accounts[this.state.accountNumber]});
-    const todoItems = await this.getTodoItems();
 
+  async scanoutItem(position) {
+    this.setState({ pending: true });
+    await this.SupplyList.checkoutItem(position, {from: web3.eth.accounts[this.state.accountNumber]});
+    const todoItems = await this.getItems();
     this.setState({ todoItems, pending: false });
   }
 }
 
 
 
-export default TodoList;
+export default SupplyList;

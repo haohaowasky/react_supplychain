@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import TodoList from './TodoList';
+import SupplyList from './SupplyList';
 
 ReactDOM.render(
-  <TodoList />,
+  <SupplyList />,
   document.getElementById('root')
 );

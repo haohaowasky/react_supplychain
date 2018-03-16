@@ -25,7 +25,17 @@ export const Header = styled.div`
   justify-content: center;
   align-items: center;
 `
-
+export const Inner = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+`
+export const InnerBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin: 0 5%;
+`
 export const H1 = styled.h1`
   color: #EEEEEE;
   font-size: 70px;
@@ -39,7 +49,7 @@ export const H2 = styled.h2`
 
 export const H3 = styled.h2`
   color: #EEEEEE;
-  font-size: 20px;
+  font-size: 15px;
 `;
 
 export const TodoListContainer = styled.section`
@@ -53,7 +63,7 @@ export const InputText = styled.input`
   border: none;
   background: rgba(0, 0, 0, 0.003);
   box-shadow: inset 0 -2px 1px rgba(0,0,0,0.03);
-  width: 540px;
+  width: auto;
 
   position: relative;
   margin: 0;
@@ -77,7 +87,7 @@ export const InputAccount = styled.input`
 
   position: relative;
   margin: 0;
-  font-size: 15px;
+  font-size: 30px;
   font-family: inherit;
   font-weight: inherit;
   line-height: 1.4em;
@@ -90,7 +100,7 @@ export const InputAccount = styled.input`
 
 
 export const List = styled.ul`
-  width: 540px;
+  width: auto;
   margin: 1;
   padding: 0;
   list-style: none;
@@ -100,7 +110,9 @@ export const TodoItem = styled.li`
   position: relative;
   font-size: 22px;
   border-bottom: 1px solid #ededed;
-
+  display: flex;
+  height: 40px;
+  line-height: 40px;
   &:last-child {
     border-bottom: none;
   }
@@ -109,8 +121,8 @@ export const TodoItem = styled.li`
 export const ItemLabel = styled.label`
   white-space: pre-line;
   word-break: break-all;
-  padding: 15px 60px 15px 15px;
-  margin-left: 45px;
+
+  margin-left: 15px;
   display: block;
   line-height: 1.2;
   transition: color 0.4s;
@@ -133,9 +145,8 @@ export const Button = styled.button`
 
 export const DestroyBtn = styled(Button)`
   position: absolute;
-  top: 0;
-  right: -50px;
-  bottom: 0;
+  right: 20px;
+  bottom: -5px;
   width: 40px;
   height: 40px;
   margin: auto 0;
@@ -144,6 +155,8 @@ export const DestroyBtn = styled(Button)`
   margin-bottom: 11px;
   transition: color 0.2s ease-out;
   cursor: pointer;
+  border-radius: 50%;
+  background: rebeccapurple;
 `;
 
 export const AccButon = styled(Button)`
@@ -162,13 +175,13 @@ export const AccButon = styled(Button)`
 `;
 
 export const PendingContainer = styled.div`
-  position: fixed;
+  position: relative;
   top: 0;
-  right: 0;
+  left: 20px;
 `;
 
 export const AccountContainer = styled.div`
-  position: fixed;
+  position: relative;
   display: flex;
   top: 0;
   left: 0;
